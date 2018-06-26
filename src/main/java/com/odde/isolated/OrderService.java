@@ -12,19 +12,23 @@ public class OrderService {
 
     public void syncBookOrders()
     {
-        List<Order> orders = this.GetOrders();
+        List<Order> orders = this.getOrders();
 
         // only get orders of book
         List<Order> ordersOfBook = orders.stream().filter(x -> x.getType().equals("Book")).collect(toList());
 
-        BookDao bookDao = new BookDao();
+        BookDao bookDao = getBookDao();
         for (Order order : ordersOfBook)
         {
             bookDao.insert(order);
         }
     }
 
-    private List<Order> GetOrders()
+    protected BookDao getBookDao() {
+        return new BookDao();
+    }
+
+    protected List<Order> getOrders()
     {
         // parse csv file to get orders
         List<Order> result = new ArrayList<>();
