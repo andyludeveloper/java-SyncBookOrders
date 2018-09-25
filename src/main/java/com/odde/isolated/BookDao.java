@@ -1,6 +1,7 @@
 package com.odde.isolated;
 
-public class BookDao {
+public class BookDao implements IBookDao {
+    @Override
     public void insert(Order order)
     {
         // directly depend on some web service
