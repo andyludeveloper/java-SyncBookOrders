@@ -10,30 +10,43 @@ import static org.mockito.Mockito.*;
 
 public class OrderServiceTest {
 
+    OrderService target = spy(OrderService.class);
+    IBookDao mockBookDao = mock(IBookDao.class);
+
     @Test
     public void syncbookorders_3_orders_only_2_book_order() {
 
-        OrderService target = spy(OrderService.class);
-        when(target.getOrders()).thenReturn(Arrays.asList(
-                new Order() {{
-                    setType("Book");
-                }},
-                new Order() {{
-                    setType("CD");
-                }},
-                new Order() {{
-                    setType("Book");
-                }}
-        ));
+        givenOrders(
+                createOrder("Book"),
+                createOrder("CD"),
+                createOrder("Book")
+        );
 
-        IBookDao mockBookDao = mock(IBookDao.class);
-        when(target.getBookDao()).thenReturn(mockBookDao);
+        givenBookDao();
 
         target.syncBookOrders();
 
-        verify(mockBookDao, times(2)).insert(
-                should(order -> assertThat(order.getType()).isEqualTo("Book"))
+        bookDaoShouldInsertOrders(2, "Book");
+    }
+
+    private void bookDaoShouldInsertOrders(int times, String type) {
+        verify(mockBookDao, times(times)).insert(
+                should(order -> assertThat(order.getType()).isEqualTo(type))
         );
+    }
+
+    private void givenBookDao() {
+        when(target.getBookDao()).thenReturn(mockBookDao);
+    }
+
+    private Order createOrder(final String type) {
+        return new Order() {{
+            setType(type);
+        }};
+    }
+
+    private void givenOrders(Order... orders) {
+        when(target.getOrders()).thenReturn(Arrays.asList(orders));
     }
 
     public static <T> T should(Consumer<T> assertion) {
