@@ -31,15 +31,22 @@ public class OrderServiceTest {
 
         target.syncBookOrders();
 
-        verify(mockBookDao, times(2)).insert(
-                should(order -> assertThat(order.getType()).isEqualTo("Book"))
-        );
+        verify(mockBookDao, times(2))
+                .insert(argThat(order -> order.getType().equals("Book")));
+
+        verify(mockBookDao, never())
+                .insert(argThat(order -> order.getType().equals("CD")));
+
+        //custom helper for argument assertions
+//        verify(mockBookDao, times(2)).insert(
+//                should(order -> assertThat(order.getType()).isEqualTo("Book"))
+//        );
     }
 
-    public static <T> T should(Consumer<T> assertion) {
-        return argThat(argument -> {
-            assertion.accept(argument);
-            return true;
-        });
-    }
+//    public static <T> T should(Consumer<T> assertion) {
+//        return argThat(argument -> {
+//            assertion.accept(argument);
+//            return true;
+//        });
+//    }
 }
