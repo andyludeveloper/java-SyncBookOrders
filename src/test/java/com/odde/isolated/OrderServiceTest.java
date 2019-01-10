@@ -27,9 +27,16 @@ public class OrderServiceTest {
         target.syncBookOrders();
 
         bookDaoShouldInsertOrders(2, "Book");
+
+        bookDaoShouldNeverInsertOrders("CD");
+    }
+
+    private void bookDaoShouldNeverInsertOrders(String type) {
+        verify(mockBookDao, never()).insert(argThat(argument -> argument.getType().equals(type)));
     }
 
     private void bookDaoShouldInsertOrders(int times, String type) {
+        //the other kind for mock assertion
         verify(mockBookDao, times(times)).insert(
                 should(order -> assertThat(order.getType()).isEqualTo(type))
         );
