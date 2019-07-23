@@ -10,32 +10,24 @@ public class OrderService {
 
     private String filePath = "C:\\temp\\testOrders.csv";
 
-    public void syncBookOrders()
-    {
-        List<Order> orders = this.getOrders();
+    public void syncBookOrders() {
+        List<Order> orders = this.GetOrders();
 
         // only get orders of book
         List<Order> ordersOfBook = orders.stream().filter(x -> x.getType().equals("Book")).collect(toList());
 
-        BookDao bookDao = getBookDao();
-        for (Order order : ordersOfBook)
-        {
+        BookDao bookDao = new BookDao();
+        for (Order order : ordersOfBook) {
             bookDao.insert(order);
         }
     }
 
-    protected BookDao getBookDao() {
-        return new BookDao();
-    }
-
-    protected List<Order> getOrders()
-    {
+    private List<Order> GetOrders() {
         // parse csv file to get orders
         List<Order> result = new ArrayList<>();
 
         // directly depend on File I/O
-        try (Scanner scanner = new Scanner(filePath))
-        {
+        try (Scanner scanner = new Scanner(filePath)) {
             int rowCount = 0;
 
             while (scanner.hasNextLine()) {
@@ -56,9 +48,8 @@ public class OrderService {
         return result;
     }
 
-    private Order Mapping(String[] line)
-    {
-        Order result = new Order(){{
+    private Order Mapping(String[] line) {
+        Order result = new Order() {{
             setProductName(line[0]);
             setType(line[1]);
             setPrice(Integer.parseInt(line[2]));
