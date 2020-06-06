@@ -9,20 +9,22 @@ import static java.util.stream.Collectors.toList;
 public class OrderService {
 
     private String filePath = "C:\\temp\\testOrders.csv";
-
     public void syncBookOrders() {
         List<Order> orders = this.getOrders();
 
         // only get orders of book
         List<Order> ordersOfBook = orders.stream().filter(x -> x.getType().equals("Book")).collect(toList());
-
-        BookDao bookDao = new BookDao();
+        IBookDao bookDao = getBookDao();
         for (Order order : ordersOfBook) {
             bookDao.insert(order);
         }
     }
 
-    private List<Order> getOrders() {
+    protected IBookDao getBookDao() {
+        return new BookDao();
+    }
+
+    protected List<Order> getOrders() {
         // parse csv file to get orders
         List<Order> result = new ArrayList<>();
 
