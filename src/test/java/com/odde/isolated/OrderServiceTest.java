@@ -12,26 +12,44 @@ public class OrderServiceTest {
     private  FakeOrderService _orderService = new FakeOrderService();
     @Test
     public void syncbookorders_3_orders_only_2_book_order() {
+        prepareDataList("Book", "CD", "Book");
 
-        // hard to isolate dependency to unit test
+        givenBookDao();
+        _orderService.syncBookOrders();
+
+        bookDaoShouldInsertOrders(2, "Book");
+        bookDaoShouldNotBeInserted("CD");
+    }
+
+    private void givenBookDao() {
+        _orderService.setBookDao(_bookDao);
+    }
+
+    private void bookDaoShouldNotBeInserted(String cd) {
+        verify(_bookDao, never()).insert(argThat(argument -> argument.getType().equals(cd)));
+    }
+
+    private void bookDaoShouldInsertOrders(int count, String type) {
+        verify(_bookDao, times(count)).insert(argThat(argument -> argument.getType().equals(type)));
+    }
+
+    private void prepareDataList(String type1, String type2, String type3) {
         List<Order> orderList = new ArrayList<>();
         Order order1 = new Order();
-        order1.setType("Book");
+        order1.setType(type1);
         Order order2 = new Order();
-        order2.setType("CD");
+        order2.setType(type2);
         Order order3 = new Order();
-        order3.setType("Book");
+        order3.setType(type3);
 
         orderList.add(order1);
         orderList.add(order2);
         orderList.add(order3);
-        _orderService.setBookDao(_bookDao);
         _orderService.setOrders(orderList);
+    }
 
-        _orderService.syncBookOrders();
-        //OrderService target = new OrderService();
-        verify(_bookDao, times(2)).insert(argThat(argument -> argument.getType().equals("Book")));
-        //target.SyncBookOrders();
+    private String order3() {
+        return "Book";
     }
 
 }
